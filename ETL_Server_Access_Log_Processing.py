@@ -2,6 +2,7 @@ import requests
 
 input_file = 'data/web-server-access-log.txt'
 extract_file = 'data/extracted-data.txt'
+transform_file = 'data/transformed.txt'
 
 def download_file():
     url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-DB0250EN-SkillsNetwork/labs/Apache%20Airflow/Build%20a%20DAG%20using%20Airflow/web-server-access-log.txt"
@@ -11,11 +12,14 @@ def download_file():
         response.raise_for_status()
         # Open a local file in binary write mode
         with open(input_file, 'wb') as file:
+            # Write the content to the local file in chunks
             for chunk in response.iter_content(chunk_size=8192):
                 file.write(chunk)
     print(f"File downloaded successfully: {input_file}")
 
 def extract():
+    global input_file
+    # Read the contents of the file into a string
     with open(input_file, 'r') as infile, \
         open(extract_file, 'w') as outfile:
         for line in infile:
@@ -25,3 +29,16 @@ def extract():
                 field_4 = fields[3]
                 outfile.write(field_1 + "#" + field_4 + "\n" )
 
+def transform():
+    global extract_file, transform_file
+    with open(extract_file, 'r') as infile, \
+        open(transform_file, 'w') as outfile:
+        for line in infile:
+            processed_line = line.upper()
+            outfile.write(processed_line + "\n")
+
+
+
+download_file()
+extract()
+transform()
